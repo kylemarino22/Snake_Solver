@@ -3,6 +3,7 @@ package core;
 import GridObjects.*;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.GreenSnake;
+import GridObjects.Snake.Snake;
 import GridObjects.Snake.YellowSnake;
 
 import java.io.File;
@@ -14,8 +15,7 @@ import static java.lang.Integer.parseInt;
 
 public class GridParser {
 
-    private GridObject[][] Grid;
-    private HashMap<Integer, Body[]> snakeMap = new HashMap<Integer, Body[]>();
+    private Grid Grid;
     private int height;
     private int width;
 
@@ -23,6 +23,8 @@ public class GridParser {
 
     public GridParser (String fileName) throws FileNotFoundException {
 
+
+        this.Grid = new Grid();
         File file = new File(fileName);
         Scanner sc;
         try{
@@ -63,7 +65,7 @@ public class GridParser {
 
             if (cells[0].equals("Width")) {
                 width = parseInt(cells[1]);
-                this.Grid = new GridObject[height][width];
+                this.Grid.grid = new GridObject[height][width];
             }
 
             if (cells[0].equals("Level")) {
@@ -76,50 +78,33 @@ public class GridParser {
 
                     String[] data = cells[i].split("\\.", -1);
                     if (data[0].equals("")) {
-                        this.Grid[levelLine][i] = new Empty();
-
+                        this.Grid.grid[levelLine][i] = new Empty();
                     }
                     else if (data[0].equals("X")) {
-                        this.Grid[levelLine][i] = new Wall();
+                        this.Grid.grid[levelLine][i] = new Wall();
                     }
                     else if (data[0].equals("-")) {
-                        this.Grid[levelLine][i] = new Exit();
+                        this.Grid.grid[levelLine][i] = new Exit();
                     }
-                    else if (data[0].equals("+")) {
+                    else if (data[0].equals("#") || data[0].equals("+") ){
                         Body temp = new Body(
                                 GridObjectType.GREEN_SNAKE,
                                 parseInt(data[1]),
-                                0,
-                                false);
-                        this.Grid[levelLine][i] = temp;
+                                0);
 
-                        try{
-                            this.snakeMap.get(0)[parseInt(data[1])] = temp;
-                        }
-                        catch (NullPointerException e) {
-                            this.snakeMap.put(0, new Body[MAX_SNAKE_LENGTH]);
-                            this.snakeMap.get(0)[parseInt(data[1])] = temp;
-                        }
+                        if(data[0].equals("#")) { temp.setHead(true); }
 
-
-
-                    }
-                    else if (data[0].equals("#")) {
-                        Body temp = new Body(
-                                GridObjectType.GREEN_SNAKE,
-                                parseInt(data[1]),
-                                0,
-                                true);
                         temp.setCoords(levelLine, i);
-                        this.Grid[levelLine][i] = temp;
-                        this.snakeMap.get(0)[parseInt(data[1])] = temp;
+                        this.Grid.grid[levelLine][i] = temp;
 
                         try{
-                            this.snakeMap.get(0)[parseInt(data[1])] = temp;
+                            this.Grid.snakeMap.get(0).bodyArray[parseInt(data[1])] = temp;
                         }
                         catch (NullPointerException e) {
-                            this.snakeMap.put(0, new Body[MAX_SNAKE_LENGTH]);
-                            this.snakeMap.get(0)[parseInt(data[1])] = temp;
+                            this.Grid.snakeMap.put(0, new Snake(
+                                    GridObjectType.GREEN_SNAKE,
+                                    new Body[MAX_SNAKE_LENGTH]));
+                            this.Grid.snakeMap.get(0).bodyArray[parseInt(data[1])] = temp;
                         }
                     }
                 }
@@ -127,28 +112,11 @@ public class GridParser {
             }
         }
 
-        consolidate();
+        Grid.consolidate();
     }
 
-    private void consolidate() {
-        //Snake consolidation
-
-        for(int i = 0; i < snakeMap.size(); i++) {
-            if (i == 0) {
-                int[] coords = snakeMap.get(i)[0].getCoords();
-                Grid[coords[0]][coords[1]] = new GreenSnake(snakeMap.get(i));
-            }
-            else {
-                int[] coords = snakeMap.get(i)[0].getCoords();
-                Grid[coords[0]][coords[1]] = new YellowSnake(snakeMap.get(i));
-            }
-
-        }
-
-
-    }
-
-    public GridObject[][] getGrid() {
+    public Grid getGrid() {
         return Grid;
     }
+
 }

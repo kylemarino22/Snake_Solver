@@ -2,7 +2,7 @@ package core;
 
 import java.io.FileNotFoundException;
 
-public class Main {
+public class Main{
 
     public static void main(String[] args) {
 
@@ -11,7 +11,8 @@ public class Main {
         GridParser gp;
         try {
              gp = new GridParser(fileName);
-             PrintGrid.PrintGrid(gp.getGrid());
+             PrintGrid.PrintGrid(gp.getGrid().grid);
+             Solver s = new Solver(gp.getGrid());
 
         }
         catch (FileNotFoundException e){

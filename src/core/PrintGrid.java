@@ -5,6 +5,8 @@ import GridObjects.GridObjectType;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.GreenSnake;
 
+import java.util.ArrayList;
+
 public abstract class PrintGrid {
 
     public static void PrintGrid(GridObject[][] Grid) {
@@ -31,19 +33,13 @@ public abstract class PrintGrid {
 
                     case GREEN_SNAKE:
 
-                        Body obj;
-                        if(Grid[i][j] instanceof GreenSnake) {
-                            obj = ((GreenSnake) Grid[i][j]).bodyArray[0];
-                        }
-                        else {
-                            obj = (Body) Grid[i][j];
-                        }
+                        Body obj = (Body) Grid[i][j];
 
                         if (obj.isHead()) {
-                            System.out.format("%-7s","#." + obj.getSegment() + ",");
+                            System.out.format("%-7s","#." + obj.getSegment());
                         }
                         else {
-                            System.out.format("%-7s","+." + obj.getSegment() + ",");
+                            System.out.format("%-7s","+." + obj.getSegment());
                         }
 
                         break;
@@ -52,6 +48,17 @@ public abstract class PrintGrid {
 
             System.out.print("\n");
         }
+        System.out.println("\n");
+    }
 
+    public static void PrintArray(ArrayList<Integer> arr) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (Integer i : arr) {
+            sb.append(" " + i.toString());
+        }
+        sb.append("]");
+
+        System.out.println(sb.toString());
     }
 }

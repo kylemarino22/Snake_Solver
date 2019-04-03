@@ -18,7 +18,17 @@ public class Snake extends GridObject {
         return length;
     }
 
+    public void setLength(int length) {
+        this.length = length;
+    }
+
     public Body[] getBodyArray() {
         return bodyArray;
+    }
+
+    public void move(int direction, boolean isHead) {
+
+
+
     }
 }
