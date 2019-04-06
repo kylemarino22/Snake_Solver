@@ -101,8 +101,7 @@ public class GridParser {
                             this.Grid.snakeMap.get(0).bodyArray[parseInt(data[1])] = temp;
                         }
                         catch (NullPointerException e) {
-                            this.Grid.snakeMap.put(0, new Snake(
-                                    GridObjectType.GREEN_SNAKE,
+                            this.Grid.snakeMap.put(0, new GreenSnake(
                                     new Body[MAX_SNAKE_LENGTH]));
                             this.Grid.snakeMap.get(0).bodyArray[parseInt(data[1])] = temp;
                         }

@@ -6,4 +6,8 @@ public class Exit extends GridObject {
         super(GridObjectType.EXIT);
     }
 
+    public Exit deepCopy () { return new Exit(); }
+
+    public String stateRep () { return null; }
+
 }

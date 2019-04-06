@@ -7,4 +7,19 @@ public class YellowSnake extends Snake {
     public YellowSnake (Body[] bodyArray) {
         super(GridObjectType.YELLOW_SNAKE, bodyArray);
     }
+
+    public YellowSnake deepCopy () {
+
+        Body[] copyBodyArray = new Body[bodyArray.length];
+
+        for (int i = 0; i < bodyArray.length; i++) {
+            copyBodyArray[i] = bodyArray[i].deepCopy();
+        }
+
+        YellowSnake ys = new YellowSnake(copyBodyArray);
+        return ys;
+    }
+
+    public String stateRep () { return "Y"; }
+
 }

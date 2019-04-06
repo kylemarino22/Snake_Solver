@@ -1,6 +1,6 @@
 package GridObjects;
 
-public class GridObject {
+public abstract class GridObject {
     private GridObjectType type;
 
     public GridObject () {}
@@ -16,4 +16,8 @@ public class GridObject {
     public void setType(GridObjectType type) {
         this.type = type;
     }
+
+    public abstract GridObject deepCopy();
+
+    public abstract String stateRep();
 }

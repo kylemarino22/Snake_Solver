@@ -12,6 +12,10 @@ import java.util.HashMap;
 public class Solver {
 
 //    private Grid Grid;
+
+    //Stores hashes that describe the state of the game
+    public ArrayList<Integer> moveList = new ArrayList<>();
+
     public Solver(Grid Grid) {
 
         move(Grid);
@@ -19,6 +23,7 @@ public class Solver {
 
 
     private void move(Grid Grid) {
+
 
         ArrayList<Body> movePoints = new ArrayList<>();
 
@@ -30,18 +35,29 @@ public class Solver {
         for(Body movePoint: movePoints) {
             ArrayList<Integer> moves = getValidMoves(Grid, movePoint);
             for(Integer moveDirection : moves) {
+                Grid newGrid = Grid.deepCopy();
 
-                Grid.moveSnake(movePoint.getSnake_ID(), moveDirection, movePoint.isHead());
+                newGrid.moveSnake(movePoint.getSnake_ID(), moveDirection, movePoint.isHead());
 
-                PrintGrid.PrintGrid(Grid.grid);
-                move(Grid);
+                //state has already occurred
+                if (!verifyState(newGrid.hashCode())) { continue; }
+
+                if (movePoint.isHead()) {
+                    System.out.println("Head Move");
+                }
+                else {
+                    System.out.println("Tail Move");
+                }
+                PrintGrid.PrintGrid(newGrid.grid);
+
+                move(newGrid);
             }
 
 
-            //finished all moves
-            return;
+
 //            PrintGrid.PrintArray(moves);
         }
+        //finished all moves
     }
 
     private ArrayList<Integer> getValidMoves (Grid g, Body b) {
@@ -49,30 +65,43 @@ public class Solver {
 
         //down => 0, right => 1, up => 2, left => 3
         ArrayList<Integer> vaildMoves = new ArrayList<>();
-        //down
-        if(validSquare(g, b, coords[0] + 1, coords[1])){
-            vaildMoves.add(0);
+
+        try {
+            //down
+            if (validSquare(g, b, coords[0] + 1, coords[1])) {
+                vaildMoves.add(0);
+            }
+            //right
+            if (validSquare(g, b, coords[0], coords[1] + 1)) {
+                vaildMoves.add(1);
+            }
+            //up
+            if (validSquare(g, b, coords[0] - 1, coords[1])) {
+                vaildMoves.add(2);
+            }
+            //left
+            if (validSquare(g, b, coords[0], coords[1] - 1)) {
+                vaildMoves.add(3);
+            }
         }
-        //right
-        if(validSquare(g, b, coords[0], coords[1]+1)){
-            vaildMoves.add(1);
-        }
-        //up
-        if(validSquare(g, b, coords[0]-1, coords[1])){
-            vaildMoves.add(2);
-        }
-        //left
-        if(validSquare(g, b, coords[0], coords[1]-1)){
-            vaildMoves.add(3);
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+            return new ArrayList<>();
         }
 
         return vaildMoves;
 
     }
 
-    private boolean validSquare (Grid g, Body movePoint, int row, int col) {
+    private boolean validSquare (Grid g, Body movePoint, int row, int col) throws Exception{
 
         GridObject current_obj = g.grid[row][col];
+
+        if (current_obj.getType() == GridObjectType.EXIT) {
+//            System.out.println("End has been reached");
+            throw new Exception("End has been reached");
+//            System.exit(0);
+        }
 
         switch (current_obj.getType()) {
 
@@ -100,4 +129,17 @@ public class Solver {
         }
         return false;
     }
+
+    private boolean verifyState (int hash) {
+        for (Integer state: moveList) {
+
+            //state has already occurred
+            if (state == hash) { return false; }
+        }
+
+        //state is new
+        moveList.add(hash);
+        return true;
+    }
+
 }

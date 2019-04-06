@@ -46,4 +46,16 @@ public class Body extends Snake{
     public int[] getCoords() {
         return coords;
     }
+
+    public Body deepCopy () {
+        Body b = new Body(this.getType(), this.segment, this.Snake_ID);
+        b.setCoords(this.coords[0], this.coords[1]);
+        b.setHead(this.isHead);
+        b.setTail(this.isTail);
+
+        return b;
+    }
+
+    public String stateRep () { return Snake_ID + (isTail() ? "" : "T" ); }
+
 }
