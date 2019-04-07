@@ -1,0 +1,76 @@
+package MoveTree;
+
+public class MoveTree {
+
+    public Node head;
+    private int minMoves = 100;
+
+    public MoveTree () {
+        head = new Node( new Move(-1, -1, false, 0));
+    }
+
+    public Node insert (Move data, Node root) {
+        Node n = new Node(data);
+        root.children.add(n);
+        return n;
+    }
+
+//    public void remove (Node root) {
+//        root = null;
+//    }
+
+    public void clean () {
+        markEnds(head);
+        pruneEnds(head);
+        findMinMoves(head);
+        System.out.println("a");
+    }
+
+    //recurses through tree to flag all end paths
+    private boolean markEnds (Node root) {
+
+        for (Node n: root.children) {
+            if(n.data.isEnd()) {
+                root.data.setEnd(true);
+                return true;
+            }
+            boolean result = markEnds(n);
+            if (result && root.data != null) {
+                root.data.setEnd(true);
+            }
+
+        }
+        return root.data.isEnd();
+    }
+
+    private void pruneEnds (Node root) {
+
+        for (int i = root.children.size() - 1; i > -1; i--) {
+            if (!root.children.get(i).data.isEnd()) {
+                root.children.remove(i);
+                continue;
+            }
+            pruneEnds(root.children.get(i));
+        }
+    }
+
+    private void findMinMoves (Node root) {
+
+        for (Node n: root.children) {
+            findMinMoves(n);
+
+            //if node is the end check if it is the smallest solution
+            if(n.children.size() == 0 &&
+                    n.data.getMoveCount() < minMoves) {
+                minMoves = n.data.getMoveCount();
+            }
+        }
+
+    }
+
+    //set paths that don't end in minMove count to false
+//    private Node pruneMinMoves (Node root) {
+//
+//    }
+
+}

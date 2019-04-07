@@ -5,9 +5,9 @@ import GridObjects.GridObjectType;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.Snake;
 
-import java.lang.reflect.Array;
+import MoveTree.*;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Solver {
 
@@ -15,15 +15,27 @@ public class Solver {
 
     //Stores hashes that describe the state of the game
     public ArrayList<Integer> moveList = new ArrayList<>();
+    public MoveTree MoveTree = new MoveTree();
+
+    private ArrayList<Integer> backMoveList = new ArrayList<>(2);
+    private int moveCounter = 0;
 
     public Solver(Grid Grid) {
 
+        Grid.lastMove = MoveTree.head;
         move(Grid);
+        MoveTree.clean();
+
+        System.out.println("done");
     }
 
 
     private void move(Grid Grid) {
 
+        if(Grid.lastMove.data.getMoveCount() > 20) {
+            System.out.println("Path took more than 20 moves. Most likely an infinite loop");
+            return;
+        }
 
         ArrayList<Body> movePoints = new ArrayList<>();
 
@@ -36,11 +48,44 @@ public class Solver {
             ArrayList<Integer> moves = getValidMoves(Grid, movePoint);
             for(Integer moveDirection : moves) {
                 Grid newGrid = Grid.deepCopy();
+                int currentMoveCount = newGrid.lastMove.data.getMoveCount();
+                Move newMove = new Move(movePoint.getSnake_ID(), moveDirection,
+                        movePoint.isHead(), currentMoveCount);
+
 
                 newGrid.moveSnake(movePoint.getSnake_ID(), moveDirection, movePoint.isHead());
 
-                //state has already occurred
-                if (!verifyState(newGrid.hashCode())) { continue; }
+                if (newMove.getSnakeID() == newGrid.lastMove.data.getSnakeID()
+                        && newMove.isHead() == newGrid.lastMove.data.isHead()) {
+                    //no new move
+                    //loop has ocurred
+                    if (!verifyState(newGrid.hashCode(currentMoveCount))) {
+                        continue;
+                    }
+                }
+                else {
+                    //new move
+
+                    //snake tried to move back (check if it is similar to 2 moves ago)
+                    int stateHash = newGrid.hashCode(moveCounter - 1);
+
+                    //check if backmove
+                    if (backMoveList.size() > 0 && backMoveList.get(0) == stateHash) { continue; }
+
+                    //add to total move list if valid
+                    moveList.add(newGrid.hashCode(currentMoveCount));
+
+
+                    currentMoveCount++;
+                }
+
+                moveCounter++;
+                addBackMove(newGrid.hashCode(moveCounter));
+
+                newMove.setMoveCount(currentMoveCount);
+
+                newGrid.lastMove = MoveTree.insert(newMove, newGrid.lastMove);
+
 
                 if (movePoint.isHead()) {
                     System.out.println("Head Move");
@@ -48,6 +93,7 @@ public class Solver {
                 else {
                     System.out.println("Tail Move");
                 }
+                System.out.println(currentMoveCount);
                 PrintGrid.PrintGrid(newGrid.grid);
 
                 move(newGrid);
@@ -99,6 +145,7 @@ public class Solver {
 
         if (current_obj.getType() == GridObjectType.EXIT) {
 //            System.out.println("End has been reached");
+            g.lastMove.data.setEnd(true);
             throw new Exception("End has been reached");
 //            System.exit(0);
         }
@@ -142,4 +189,14 @@ public class Solver {
         return true;
     }
 
+    private void addBackMove (int hash) {
+
+        if(backMoveList.size() > 1) {
+            backMoveList.set(0, backMoveList.get(1));
+            backMoveList.set(1, hash);
+        }
+        else {
+            backMoveList.add(hash);
+        }
+    }
 }

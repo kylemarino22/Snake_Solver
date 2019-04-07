@@ -6,6 +6,8 @@ import GridObjects.GridObjectType;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.Snake;
 import GridObjects.Wall;
+import MoveTree.Move;
+import MoveTree.Node;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +15,8 @@ import java.util.HashMap;
 public class Grid {
     public GridObject[][] grid;
     public HashMap<Integer, Snake> snakeMap = new HashMap<>();
+    public Node lastMove;
+    public boolean prevSwitch = false;
 
     public Grid () {}
 
@@ -183,12 +187,15 @@ public class Grid {
             g.snakeMap.put(i, this.snakeMap.get(i).deepCopy());
         }
 
+        g.lastMove = this.lastMove;
+        g.prevSwitch = this.prevSwitch;
         return g;
     }
 
-    public int hashCode() {
+    public int hashCode(int moveCount) {
 
         StringBuilder gameState = new StringBuilder();
+        gameState.append(moveCount);
         for (GridObject[] row: this.grid) {
             for (GridObject obj: row){
 
