@@ -22,8 +22,11 @@ public class MoveTree {
     public void clean () {
         markEnds(head);
         pruneEnds(head);
+        resetEnds(head);
         findMinMoves(head);
-        System.out.println("a");
+        pruneMinMoves(head);
+        markEnds(head);
+        pruneEnds(head);
     }
 
     //recurses through tree to flag all end paths
@@ -60,17 +63,43 @@ public class MoveTree {
             findMinMoves(n);
 
             //if node is the end check if it is the smallest solution
-            if(n.children.size() == 0 &&
-                    n.data.getMoveCount() < minMoves) {
-                minMoves = n.data.getMoveCount();
+            if (n.children.size() == 0) {
+                if (n.data.getMoveCount() < minMoves) {
+                    minMoves = n.data.getMoveCount();
+                }
+
             }
+
         }
 
     }
 
     //set paths that don't end in minMove count to false
-//    private Node pruneMinMoves (Node root) {
-//
-//    }
+    private void pruneMinMoves (Node root) {
+
+        for (int i = root.children.size() - 1; i > -1; i--) {
+            if (root.children.get(i).data.getMoveCount() > minMoves) {
+                root.children.remove(i);
+                continue;
+            }
+            pruneEnds(root.children.get(i));
+        }
+
+    }
+
+    private void resetEnds (Node root) {
+
+        for (Node n: root.children) {
+            resetEnds(n);
+        }
+
+        if (root.children.size() == 0) {
+            //switch end flag to indicate end
+            root.data.setEnd(true);
+        }
+        else {
+            root.data.setEnd(false);
+        }
+    }
 
 }
