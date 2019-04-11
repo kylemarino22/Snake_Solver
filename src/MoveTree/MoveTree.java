@@ -82,7 +82,7 @@ public class MoveTree {
                 root.children.remove(i);
                 continue;
             }
-            pruneEnds(root.children.get(i));
+            pruneMinMoves(root.children.get(i));
         }
 
     }

@@ -5,8 +5,6 @@ import GridObjects.GridObject;
 import GridObjects.GridObjectType;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.Snake;
-import GridObjects.Wall;
-import MoveTree.Move;
 import MoveTree.Node;
 
 import java.util.ArrayList;
@@ -16,7 +14,9 @@ public class Grid {
     public GridObject[][] grid;
     public HashMap<Integer, Snake> snakeMap = new HashMap<>();
     public Node lastMove;
-    public boolean prevSwitch = false;
+    public int layer = 0;
+    public ArrayList<Integer> backMoveList = new ArrayList<>(2);
+
 
     public Grid () {}
 
@@ -46,6 +46,7 @@ public class Grid {
     public void moveSnake (int Snake_ID, int direction, boolean isHead) {
 
         Snake s = snakeMap.get(Snake_ID);
+        //TODO: If head moves into tail or vice versa, have it work
 
         if (isHead) {
 
@@ -53,12 +54,17 @@ public class Grid {
 
             Body head = s.bodyArray[0];
 
+            GridObject replacedObj = new Empty();
+
             if (direction == 0) {
                 //store old coords
                 prevCoords = head.getCoords();
 
                 //update body's self location
                 head.setCoords(prevCoords[0] + 1, prevCoords[1]);
+
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0] + 1][prevCoords[1]];
 
                 //move gridobject to new location
                 grid[prevCoords[0] + 1][prevCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
@@ -70,6 +76,9 @@ public class Grid {
                 //update body's self location
                 head.setCoords(prevCoords[0], prevCoords[1] + 1);
 
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0]][prevCoords[1] + 1];
+
                 //move gridobject to new location
                 grid[prevCoords[0]][prevCoords[1] + 1] = grid[prevCoords[0]][prevCoords[1]];
             }
@@ -80,6 +89,9 @@ public class Grid {
                 //update body's self location
                 head.setCoords(prevCoords[0] - 1, prevCoords[1]);
 
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0] - 1][prevCoords[1]];
+
                 //move gridobject to new location
                 grid[prevCoords[0] - 1][prevCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
             }
@@ -89,6 +101,9 @@ public class Grid {
 
                 //update body's self location
                 head.setCoords(prevCoords[0], prevCoords[1] - 1);
+
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0]][prevCoords[1] - 1];
 
                 //move gridobject to new location
                 grid[prevCoords[0]][prevCoords[1] - 1] = grid[prevCoords[0]][prevCoords[1]];
@@ -101,12 +116,18 @@ public class Grid {
                 //update body's self location
                 s.bodyArray[i].setCoords(newCoords[0], newCoords[1]);
 
-                //move gridobject to new location
-                grid[newCoords[0]][newCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
+//                else {
+                    //move gridobject to new location
+                    grid[newCoords[0]][newCoords[1]] = s.bodyArray[i];
+//                }
+
 
             }
 
-            grid[prevCoords[0]][prevCoords[1]] = new Empty();
+            if (replacedObj.getType() != GridObjectType.GREEN_SNAKE
+                    || replacedObj.getType() != GridObjectType.YELLOW_SNAKE) {
+                grid[prevCoords[0]][prevCoords[1]] = replacedObj;
+            }
 
         }
         else {
@@ -114,12 +135,17 @@ public class Grid {
 
             Body tail = s.bodyArray[s.getLength()];
 
+            GridObject replacedObj = new Empty();
+
             if (direction == 0) {
                 //store old coords
                 prevCoords = tail.getCoords();
 
                 //update body's self location
                 tail.setCoords(prevCoords[0] + 1, prevCoords[1]);
+
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0] + 1][prevCoords[1]];
 
                 //move gridobject to new location
                 grid[prevCoords[0] + 1][prevCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
@@ -131,6 +157,9 @@ public class Grid {
                 //update body's self location
                 tail.setCoords(prevCoords[0], prevCoords[1] + 1);
 
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0]][prevCoords[1] + 1];
+
                 //move gridobject to new location
                 grid[prevCoords[0]][prevCoords[1] + 1] = grid[prevCoords[0]][prevCoords[1]];
             }
@@ -141,6 +170,9 @@ public class Grid {
                 //update body's self location
                 tail.setCoords(prevCoords[0] - 1, prevCoords[1]);
 
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0] - 1][prevCoords[1]];
+
                 //move gridobject to new location
                 grid[prevCoords[0] - 1][prevCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
             }
@@ -150,6 +182,9 @@ public class Grid {
 
                 //update body's self location
                 tail.setCoords(prevCoords[0], prevCoords[1] - 1);
+
+                //store replaced Obj
+                replacedObj = grid[prevCoords[0]][prevCoords[1] - 1];
 
                 //move gridobject to new location
                 grid[prevCoords[0]][prevCoords[1] - 1] = grid[prevCoords[0]][prevCoords[1]];
@@ -163,11 +198,25 @@ public class Grid {
                 s.bodyArray[i].setCoords(newCoords[0], newCoords[1]);
 
                 //move gridobject to new location
-                grid[newCoords[0]][newCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
+                grid[newCoords[0]][newCoords[1]] = s.bodyArray[i];
 
             }
 
-            grid[prevCoords[0]][prevCoords[1]] = new Empty();
+            if (replacedObj.getType() != GridObjectType.GREEN_SNAKE
+                    ||replacedObj.getType() != GridObjectType.YELLOW_SNAKE) {
+                grid[prevCoords[0]][prevCoords[1]] = replacedObj;
+            }
+        }
+    }
+
+    public void addBackMove (int hash) {
+
+        if(backMoveList.size() > 1) {
+            backMoveList.set(0, backMoveList.get(1));
+            backMoveList.set(1, hash);
+        }
+        else {
+            backMoveList.add(hash);
         }
     }
 
@@ -187,15 +236,23 @@ public class Grid {
             g.snakeMap.put(i, this.snakeMap.get(i).deepCopy());
         }
 
+        for (Integer i: backMoveList) {
+            g.backMoveList.add(i);
+
+        }
+
         g.lastMove = this.lastMove;
-        g.prevSwitch = this.prevSwitch;
+        g.layer = this.layer;
+
         return g;
     }
 
-    public int hashCode(int moveCount) {
+    public int hashCode(int ...data) {
 
         StringBuilder gameState = new StringBuilder();
-        gameState.append(moveCount);
+        for (int i: data) {
+            gameState.append(i);
+        }
         for (GridObject[] row: this.grid) {
             for (GridObject obj: row){
 

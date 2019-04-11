@@ -6,12 +6,12 @@ public class Main{
 
     public static void main(String[] args) {
 
-        final String fileName = "resources/input.csv";
+        final String fileName = "resources/level01.txt";
 
         GridParser gp;
         try {
              gp = new GridParser(fileName);
-             PrintGrid.PrintGrid(gp.getGrid().grid);
+             PrintGrid.printGrid(gp.getGrid().grid, true);
              Solver s = new Solver(gp.getGrid());
 
         }

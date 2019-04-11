@@ -55,7 +55,7 @@ public class GridParser {
                 continue;
             }
 
-            if (skipLine) {
+            if (skipLine != false) {
                 continue;
             }
 
@@ -104,6 +104,26 @@ public class GridParser {
                             this.Grid.snakeMap.put(0, new GreenSnake(
                                     new Body[MAX_SNAKE_LENGTH]));
                             this.Grid.snakeMap.get(0).bodyArray[parseInt(data[1])] = temp;
+                        }
+                    }
+                    else if (data[0].equals("*") || data[0].equals("@") ){
+                        Body temp = new Body(
+                                GridObjectType.YELLOW_SNAKE,
+                                parseInt(data[1]),
+                                parseInt(data[2]));
+
+                        if(data[0].equals("@")) { temp.setHead(true); }
+
+                        temp.setCoords(levelLine, i);
+                        this.Grid.grid[levelLine][i] = temp;
+
+                        try{
+                            this.Grid.snakeMap.get(parseInt(data[2])).bodyArray[parseInt(data[1])] = temp;
+                        }
+                        catch (NullPointerException e) {
+                            this.Grid.snakeMap.put(parseInt(data[2]), new YellowSnake(
+                                    new Body[MAX_SNAKE_LENGTH]));
+                            this.Grid.snakeMap.get(parseInt(data[2])).bodyArray[parseInt(data[1])] = temp;
                         }
                     }
                 }
