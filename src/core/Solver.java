@@ -1,5 +1,7 @@
 package core;
 
+import GridObjects.Block.Block;
+import GridObjects.Block.BlockGroup;
 import GridObjects.GridObject;
 import GridObjects.GridObjectType;
 import GridObjects.Snake.Body;
@@ -17,28 +19,43 @@ public class Solver {
     public ArrayList<Integer> moveList = new ArrayList<>();
     public MoveTree MoveTree = new MoveTree();
 
+    private static final int MAX_LAYER_COUNT = 30;
+
     private int moveCounter = 0;
+    private long startTime, estimatedTime;
 
     public Solver(Grid mainGrid) {
 
         mainGrid.lastMove = MoveTree.head;
         mainGrid.addBackMove(mainGrid.hashCode(-1));
+
+        startTime = System.nanoTime();
         move(mainGrid);
         MoveTree.clean();
 
         PrintGrid.printSolution(MoveTree, mainGrid.deepCopy());
 
+        estimatedTime = System.nanoTime();
+
+        System.out.println(TimeConverter.convertTimeToString(estimatedTime - startTime));
+
+        System.out.println(moveCounter);
         System.out.println("done");
     }
 
 
-    private void move(Grid mainGrid) {
+    private void move (Grid mainGrid) {
 
-        if (mainGrid.lastMove.data.getMoveCount() > 2) {
-//            System.out.print("Path took more than 2 moves. Most likely an infinite loop");
+        if (mainGrid.lastMove.data.getMoveCount() > Grid.TOTAL_MOVES) {
+//            System.out.print("Path took more than n moves. Most likely an infinite loop");
             return;
         }
 
+        if (mainGrid.layer > MAX_LAYER_COUNT) {
+            return;
+        }
+
+        moveCounter++;
         ArrayList<Body> movePoints = new ArrayList<>();
 
         for (Snake s: mainGrid.snakeMap.values()) {
@@ -46,7 +63,7 @@ public class Solver {
             movePoints.add(s.bodyArray[s.getLength()]);
         }
         PrintGrid.printIndented(mainGrid.layer, "Pause");
-        for(Body movePoint: movePoints) {
+        for (Body movePoint: movePoints) {
             ArrayList<Integer> moves = getValidMoves(mainGrid, movePoint);
             for(Integer moveDirection : moves) {
 
@@ -131,19 +148,19 @@ public class Solver {
 
         try {
             //down
-            if (validSquare(g, b, coords[0] + 1, coords[1])) {
+            if (validSquare(g, b, coords[0] + 1, coords[1], 0)) {
                 vaildMoves.add(0);
             }
             //right
-            if (validSquare(g, b, coords[0], coords[1] + 1)) {
+            if (validSquare(g, b, coords[0], coords[1] + 1, 1)) {
                 vaildMoves.add(1);
             }
             //up
-            if (validSquare(g, b, coords[0] - 1, coords[1])) {
+            if (validSquare(g, b, coords[0] - 1, coords[1], 2)) {
                 vaildMoves.add(2);
             }
             //left
-            if (validSquare(g, b, coords[0], coords[1] - 1)) {
+            if (validSquare(g, b, coords[0], coords[1] - 1, 3)) {
                 vaildMoves.add(3);
             }
         }
@@ -156,7 +173,7 @@ public class Solver {
 
     }
 
-    private boolean validSquare (Grid g, Body movePoint, int row, int col) throws Exception{
+    private boolean validSquare (Grid g, Body movePoint, int row, int col, int direction) throws Exception{
 
         GridObject current_obj = g.grid[row][col];
 
@@ -172,6 +189,16 @@ public class Solver {
         switch (current_obj.getType()) {
 
             case EMPTY: return true;
+            case APPLE:
+                if (movePoint.isHead()) { return true; }
+                return false;
+            case MUSHROOM:
+                if (movePoint.isHead()) { return true; }
+                return false;
+
+            case BLOCK:
+                return validBlock(g, ((Block) current_obj).getBlock_ID(), direction);
+
             case EXIT: return false;
         }
 
@@ -194,6 +221,42 @@ public class Solver {
 
         }
         return false;
+    }
+
+    private boolean validBlock (Grid g, int block_id, int direction) {
+        BlockGroup bg = g.blockMap.get(block_id);
+
+       for (int i = 0; i < bg.blockCount+1; i++) {
+            int[] blockCoords = bg.blockArray[i].getCoords();
+            int[] newCoords = new int[2];
+
+            if (direction == 0) {
+                newCoords[0] = blockCoords[0] + 1;
+                newCoords[1] = blockCoords[1];
+            } else if (direction == 1) {
+                newCoords[0] = blockCoords[0];
+                newCoords[1] = blockCoords[1] + 1;
+            } else if (direction == 2) {
+                newCoords[0] = blockCoords[0] - 1;
+                newCoords[1] = blockCoords[1];
+            } else if (direction == 3) {
+                newCoords[0] = blockCoords[0];
+                newCoords[1] = blockCoords[1] - 1;
+            }
+
+            if (g.grid[newCoords[0]][newCoords[1]].getType() != GridObjectType.EMPTY) {
+
+                if (g.grid[newCoords[0]][newCoords[1]].getType() != GridObjectType.BLOCK) {
+                    return false;
+                }
+                else {
+                    if (((Block) g.grid[newCoords[0]][newCoords[1]]).getBlock_ID() != block_id) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private boolean verifyState (int hash) {

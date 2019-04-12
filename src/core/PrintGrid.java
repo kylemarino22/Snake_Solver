@@ -1,5 +1,6 @@
 package core;
 
+import GridObjects.Block.Block;
 import GridObjects.GridObject;
 import GridObjects.Snake.Body;
 
@@ -47,6 +48,18 @@ public abstract class PrintGrid {
 
                     case EXIT:
                         System.out.format("%-7s","-");
+                        break;
+
+                    case APPLE:
+                        System.out.format("%-7s","^");
+                        break;
+
+                    case MUSHROOM:
+                        System.out.format("%-7s","v");
+                        break;
+
+                    case BLOCK:
+                        System.out.format("%-7s","[" + ((Block) Grid[i][j]).getBlock_ID() + "]");
                         break;
 
                     case GREEN_SNAKE:
@@ -137,6 +150,18 @@ public abstract class PrintGrid {
 
                         case EXIT:
                             System.out.format("%-7s","-");
+                            break;
+
+                        case APPLE:
+                            System.out.format("%-7s","^");
+                            break;
+
+                        case MUSHROOM:
+                            System.out.format("%-7s","v");
+                            break;
+
+                        case BLOCK:
+                            System.out.format("%-7s","[" + ((Block) temp[i][j]).getBlock_ID() + "]");
                             break;
 
                         case GREEN_SNAKE:

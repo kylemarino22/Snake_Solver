@@ -1,10 +1,10 @@
 ===============================================================================
 
-Input file for GridObjects.Snake.Snake Slider
+Input file for Snake Slider
 
-GridObjects.Key:
-  +.2, +.1, #.0 is the green GridObjects.Snake.Snake
-  *.2.1, *.1.1, @.0.1 is the yellow GridObjects.Snake.Snake
+Key:
+  +.2, +.1, #.0 is the green Snake
+  *.2.1, *.1.1, @.0.1 is the Snake
   [1] is a block
   $.1, is a key
   X is a wall
@@ -17,17 +17,16 @@ GridObjects.Key:
 
 ===============================================================================
 
-Height, 9
+Height, 8
 Width, 7
-Moves, 2
+Moves, 1
 
 Level
 X,     X,     X,     -,     X,     X,     X
-X, *.4.1, *.3.1, *.2.1, *.1.1, @.0.1,     X
-X,      ,     X,     X,     X,      ,     X
 X,      ,      ,      ,      ,      ,     X
-X,     X,     X,   #.0,     X,     X,     X
-X,     X,     X,   +.1,     X,     X,     X
-X,     X,     X,   +.2,     X,     X,     X
-X,     X,     X,   +.3,     X,     X,     X
+X,      ,     X,      ,     X,      ,     X
+X,   [0],      ,   [1],      ,   [2],     X
+X,      ,     X,      ,     X,      ,     X
+X,      ,      ,      ,      ,      ,     X
+X,   +.4,   +.3,   +.2,   +.1,   #.0,     X
 X,     X,     X,     X,     X,     X,     X

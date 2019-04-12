@@ -6,7 +6,7 @@ public class Main{
 
     public static void main(String[] args) {
 
-        final String fileName = "resources/level01.txt";
+        final String fileName = "resources/level51.txt";
 
         GridParser gp;
         try {

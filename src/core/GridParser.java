@@ -1,6 +1,8 @@
 package core;
 
 import GridObjects.*;
+import GridObjects.Block.Block;
+import GridObjects.Block.BlockGroup;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.GreenSnake;
 import GridObjects.Snake.Snake;
@@ -19,7 +21,7 @@ public class GridParser {
     private int height;
     private int width;
 
-    final int MAX_SNAKE_LENGTH = 15;
+    private final int MAX_SNAKE_LENGTH = 20;
 
     public GridParser (String fileName) throws FileNotFoundException {
 
@@ -68,6 +70,11 @@ public class GridParser {
                 this.Grid.grid = new GridObject[height][width];
             }
 
+            if (cells[0].equals("Moves")) {
+                this.Grid.TOTAL_MOVES = parseInt(cells[1]);
+
+            }
+
             if (cells[0].equals("Level")) {
                 levelConstruction = true;
                 continue;
@@ -85,6 +92,39 @@ public class GridParser {
                     }
                     else if (data[0].equals("-")) {
                         this.Grid.grid[levelLine][i] = new Exit();
+                    }
+                    else if (data[0].equals("^")) {
+                        this.Grid.grid[levelLine][i] = new Apple();
+                    }
+                    else if (data[0].equals("v")) {
+                        this.Grid.grid[levelLine][i] = new Mushroom();
+                    }
+                    else if (data[0].charAt(0) == '[') {
+
+                        int block_id = Character.getNumericValue(data[0].charAt(1));
+
+
+                        Block temp = new Block(block_id);
+
+                        temp.setCoords(levelLine, i);
+                        this.Grid.grid[levelLine][i] = temp;
+
+                        try{
+                            BlockGroup currentGroup = this.Grid.blockMap.get(block_id);
+                            currentGroup.blockArray[currentGroup.blockCount] = temp;
+                            currentGroup.blockCount++;
+
+                        }
+                        catch (NullPointerException e) {
+                            this.Grid.blockMap.put(block_id, new BlockGroup(
+                                    block_id,
+                                    new Block[MAX_SNAKE_LENGTH]));
+                            this.Grid.blockMap.get(block_id).blockArray[0] = temp;
+                            this.Grid.blockMap.get(block_id).blockCount++;
+                        }
+
+
+
                     }
                     else if (data[0].equals("#") || data[0].equals("+") ){
                         Body temp = new Body(
