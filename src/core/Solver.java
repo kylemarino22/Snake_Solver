@@ -30,6 +30,7 @@ public class Solver {
         mainGrid.addBackMove(mainGrid.hashCode(-1));
 
         startTime = System.nanoTime();
+        System.out.println("Solving...");
         move(mainGrid);
         MoveTree.clean();
 
@@ -56,6 +57,10 @@ public class Solver {
         }
 
         moveCounter++;
+
+        if (moveCounter % 10000 == 0) {
+            System.out.print(" .");
+        }
         ArrayList<Body> movePoints = new ArrayList<>();
 
         for (Snake s: mainGrid.snakeMap.values()) {
