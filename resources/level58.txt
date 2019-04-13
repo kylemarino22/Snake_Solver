@@ -1,0 +1,31 @@
+===============================================================================
+
+Input file for GridObjects.Snake.Snake Slider
+
+GridObjects.Key:
+  +.2, +.1, #.0 is the green GridObjects.Snake.Snake
+  *.2.1, *.1.1, @.0.1 is the yellow GridObjects.Snake.Snake
+  [1] is a block
+  $.1, is a key
+  X is a wall
+  ^ is an apple
+  v is mushroom
+  "" is an empty cell
+  $.1.^ is an apple key
+  &.1 is a lock
+  - is the exit
+
+===============================================================================
+
+Height, 7
+Width, 7
+Moves, 7
+
+Level
+X,     -,     X,     X,     X,     X,     X
+X, *.1.1, @.0.1,   [2], *.0.2, *.1.2,     X
+X, *.2.1,   [1],   [2], *.3.2, *.2.2,     X
+X,   [0],   [0],   [3],   [4],   [4],     X
+X,   #.0,   +.3,   [5],      ,      ,     X
+X,   +.1,   +.2,   [5],      ,      ,     X
+X,     X,     X,     X,     X,     X,     X

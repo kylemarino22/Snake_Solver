@@ -23,6 +23,7 @@ public class BlockGroup extends Block {
         }
 
         BlockGroup b = new BlockGroup(copyBlockArray[0].getBlock_ID(), copyBlockArray);
+        b.blockCount = this.blockCount;
         return b;
     }
 

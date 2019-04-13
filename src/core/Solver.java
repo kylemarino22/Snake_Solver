@@ -64,6 +64,10 @@ public class Solver {
         }
         PrintGrid.printIndented(mainGrid.layer, "Pause");
         for (Body movePoint: movePoints) {
+
+//            if (movePoint.getSnake_ID() == 2 ){
+//                System.out.println("pause");
+//            }
             ArrayList<Integer> moves = getValidMoves(mainGrid, movePoint);
             for(Integer moveDirection : moves) {
 
@@ -127,7 +131,13 @@ public class Solver {
                 PrintGrid.printIndented(mainGrid.layer,"Total moveCount: " + mainGrid.layer);
                 PrintGrid.printIndented(mainGrid.layer,"         " + newGrid.backMoveList.get(0) +
                         "                                 " + newGrid.backMoveList.get(1));
+
+//                if (newGrid.backMoveList.get(0) == -998436057 && newGrid.backMoveList.get(1) == -33681082) {
+//                    System.out.println("Stop");
+//                }
                 PrintGrid.printSideBySide(mainGrid.grid, newGrid.grid, newGrid.layer);
+
+
 
                 newGrid.layer++;
                 move(newGrid);
@@ -189,6 +199,7 @@ public class Solver {
         switch (current_obj.getType()) {
 
             case EMPTY: return true;
+            case WALL: return false;
             case APPLE:
                 if (movePoint.isHead()) { return true; }
                 return false;

@@ -31,6 +31,7 @@ public class Grid {
             int length = getMaxArrayIndex(temp.bodyArray);
             temp.setLength(length);
             temp.bodyArray[length].setTail(true);
+            temp.bodyArray[0].setHead(true);
         }
 
         for (int i = 0; i < blockMap.size(); i++) {
@@ -202,7 +203,13 @@ public class Grid {
                 tail.setCoords(prevCoords[0] + 1, prevCoords[1]);
 
                 //store replaced Obj
-                replacedObj = grid[prevCoords[0] + 1][prevCoords[1]];
+                if (grid[prevCoords[0] + 1][prevCoords[1]].getType() != GridObjectType.BLOCK) {
+                    replacedObj = grid[prevCoords[0] + 1][prevCoords[1]];
+                }
+                else {
+                    moveBlock(((Block) grid[prevCoords[0] + 1][prevCoords[1]]).getBlock_ID(), direction);
+                    replacedObj = new Empty();
+                }
 
                 //move gridobject to new location
                 grid[prevCoords[0] + 1][prevCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
@@ -215,7 +222,13 @@ public class Grid {
                 tail.setCoords(prevCoords[0], prevCoords[1] + 1);
 
                 //store replaced Obj
-                replacedObj = grid[prevCoords[0]][prevCoords[1] + 1];
+                if (grid[prevCoords[0]][prevCoords[1] + 1].getType() != GridObjectType.BLOCK) {
+                    replacedObj = grid[prevCoords[0]][prevCoords[1] + 1];
+                }
+                else {
+                    moveBlock(((Block) grid[prevCoords[0]][prevCoords[1] + 1]).getBlock_ID(), direction);
+                    replacedObj = new Empty();
+                }
 
                 //move gridobject to new location
                 grid[prevCoords[0]][prevCoords[1] + 1] = grid[prevCoords[0]][prevCoords[1]];
@@ -227,8 +240,18 @@ public class Grid {
                 //update body's self location
                 tail.setCoords(prevCoords[0] - 1, prevCoords[1]);
 
-                //store replaced Obj
-                replacedObj = grid[prevCoords[0] - 1][prevCoords[1]];
+                if (prevCoords[0] - 1 == -1) {
+                    PrintGrid.printGrid(grid, true);
+                    System.out.println("Stop");
+                }
+
+                if (grid[prevCoords[0] - 1][prevCoords[1]].getType() != GridObjectType.BLOCK) {
+                    replacedObj = grid[prevCoords[0] - 1][prevCoords[1]];
+                }
+                else {
+                    moveBlock(((Block) grid[prevCoords[0] - 1][prevCoords[1]]).getBlock_ID(), direction);
+                    replacedObj = new Empty();
+                }
 
                 //move gridobject to new location
                 grid[prevCoords[0] - 1][prevCoords[1]] = grid[prevCoords[0]][prevCoords[1]];
@@ -240,8 +263,13 @@ public class Grid {
                 //update body's self location
                 tail.setCoords(prevCoords[0], prevCoords[1] - 1);
 
-                //store replaced Obj
-                replacedObj = grid[prevCoords[0]][prevCoords[1] - 1];
+                if (grid[prevCoords[0]][prevCoords[1] - 1].getType() != GridObjectType.BLOCK) {
+                    replacedObj = grid[prevCoords[0]][prevCoords[1] - 1];
+                }
+                else {
+                    moveBlock(((Block) grid[prevCoords[0]][prevCoords[1] - 1]).getBlock_ID(), direction);
+                    replacedObj = new Empty();
+                }
 
                 //move gridobject to new location
                 grid[prevCoords[0]][prevCoords[1] - 1] = grid[prevCoords[0]][prevCoords[1]];
