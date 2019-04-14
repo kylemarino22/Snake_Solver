@@ -12,7 +12,7 @@ public class Main{
         try {
              gp = new GridParser(fileName);
              PrintGrid.printGrid(gp.getGrid().grid, true);
-             Solver s = new Solver(gp.getGrid());
+             new Solver(gp.getGrid());
 
         }
         catch (FileNotFoundException e){

@@ -19,7 +19,7 @@ public class Solver {
     public ArrayList<Integer> moveList = new ArrayList<>();
     public MoveTree MoveTree = new MoveTree();
 
-    private static final int MAX_LAYER_COUNT = 30;
+    private static final int MAX_LAYER_COUNT = 35;
 
     private int moveCounter = 0;
     private long startTime, estimatedTime;
@@ -31,7 +31,13 @@ public class Solver {
 
         startTime = System.nanoTime();
         System.out.println("Solving...");
-        move(mainGrid);
+
+        try {
+            move(mainGrid);
+        }
+        catch (Exception e) {
+            System.out.println("End has been reahed");
+        }
         MoveTree.clean();
 
         PrintGrid.printSolution(MoveTree, mainGrid.deepCopy());
@@ -45,7 +51,7 @@ public class Solver {
     }
 
 
-    private void move (Grid mainGrid) {
+    private void move (Grid mainGrid) throws Exception{
 
         if (mainGrid.lastMove.data.getMoveCount() > Grid.TOTAL_MOVES) {
 //            System.out.print("Path took more than n moves. Most likely an infinite loop");
@@ -73,7 +79,13 @@ public class Solver {
 //            if (movePoint.getSnake_ID() == 2 ){
 //                System.out.println("pause");
 //            }
-            ArrayList<Integer> moves = getValidMoves(mainGrid, movePoint);
+            ArrayList<Integer> moves;
+            try {
+                 moves = getValidMoves(mainGrid, movePoint);
+            }
+            catch (Exception e) {
+                throw new Exception("End has been reached");
+            }
             for(Integer moveDirection : moves) {
 
                 Grid newGrid = mainGrid.deepCopy();
@@ -155,7 +167,7 @@ public class Solver {
         //finished all moves
     }
 
-    private ArrayList<Integer> getValidMoves (Grid g, Body b) {
+    private ArrayList<Integer> getValidMoves (Grid g, Body b) throws Exception {
         int[] coords = b.getCoords();
 
         //down => 0, right => 1, up => 2, left => 3
@@ -181,7 +193,7 @@ public class Solver {
         }
         catch (Exception e) {
             PrintGrid.printIndented(g.layer, e.getMessage());
-            return new ArrayList<>();
+            throw new Exception("End has been reached");
         }
 
         return vaildMoves;
