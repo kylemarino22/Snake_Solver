@@ -4,6 +4,7 @@ import GridObjects.Block.Block;
 import GridObjects.Block.BlockGroup;
 import GridObjects.GridObject;
 import GridObjects.GridObjectType;
+import GridObjects.Lock;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.Snake;
 
@@ -15,8 +16,6 @@ import java.util.Collections;
 
 public class Solver {
 
-//    private Grid Grid;
-
     //Stores hashes that describe the state of the game
     public static ArrayList<Integer> moveList = new ArrayList<>();
     public MoveTree MoveTree = new MoveTree();
@@ -24,7 +23,6 @@ public class Solver {
     private static final int MAX_LAYER_COUNT = 35;
 
     private int moveCounter = 0;
-//    private long startTime, estimatedTime;
 
     public Solver(Grid mainGrid) {
 
@@ -40,6 +38,7 @@ public class Solver {
         catch (Exception e) {
             System.out.println("End has been reached");
         }
+
         MoveTree.clean();
 
         PrintGrid.printSolution(MoveTree, mainGrid.deepCopy());
@@ -48,25 +47,15 @@ public class Solver {
 
         System.out.println(TimeConverter.convertTimeToString(estimatedTime - startTime));
 
-        System.out.println(moveCounter);
+        System.out.println("Permutations: " + moveCounter);
         System.out.println("done");
     }
 
-//    public Solver (Grid mainGrid, ThreadState initVector) {
-//        //Todo: get mainGrid to IV state, recurse 10,000 moves
-//
-//        for (ThreadState.State s: initVector.stateArray) {
-//            mainGrid.moveSnake(s.snakeID, s.direction, s.head);
-//        }
-//
-//
-//    }
 
 
     private void move (Grid mainGrid) throws Exception{
 
         if (mainGrid.lastMove.data.getMoveCount() > Grid.TOTAL_MOVES) {
-//            System.out.print("Path took more than n moves. Most likely an infinite loop");
             return;
         }
 
@@ -76,9 +65,6 @@ public class Solver {
 
         moveCounter++;
 
-        if (moveCounter % 10000 == 0) {
-            System.out.print(" .");
-        }
         ArrayList<Body> movePoints = new ArrayList<>();
 
         for (Snake s: mainGrid.snakeMap.values()) {
@@ -88,9 +74,6 @@ public class Solver {
         PrintGrid.printIndented(mainGrid.layer, "Pause");
         for (Body movePoint: movePoints) {
 
-//            if (movePoint.getSnake_ID() == 2 ){
-//                System.out.println("pause");
-//            }
             ArrayList<Integer> moves;
             try {
                  moves = getValidMoves(mainGrid, movePoint);
@@ -116,11 +99,10 @@ public class Solver {
                     if (find(hash)) {
 
                         PrintGrid.printIndented(mainGrid.layer,"Repeated State");
-                        //-857074242
                         continue;
                     }
 
-                    if(mainGrid.layer < 15) {
+                    if(mainGrid.layer < 25) {
                         insert(hash);
                     }
                 }
@@ -129,10 +111,6 @@ public class Solver {
 
                     //snake tried to move back (check if it is similar to 2 moves ago)
                     int stateHash = newGrid.hashCode(mainGrid.layer - 2);
-//                    int abc = newGrid.hashCode(Grid.layer - 2);
-//                    int abc1 = newGrid.hashCode(Grid.layer - 3);
-//                    int abc2 = newGrid.hashCode(Grid.layer - 4);
-
 
                     //check if backmove
                     if (newGrid.backMoveList.size() > 0 && newGrid.backMoveList.get(0) == stateHash) { continue; }
@@ -142,49 +120,32 @@ public class Solver {
 
                     //add to total move list if valid
 
-                    if(mainGrid.layer < 15) {
+                    if(mainGrid.layer < 25) {
                         insert(newGrid.hashCode(currentMoveCount));
                     }
 
                     currentMoveCount++;
                 }
 
-//                moveCounter++;
                 newGrid.addBackMove(newGrid.hashCode(mainGrid.layer));
 
                 newMove.setMoveCount(currentMoveCount);
 
                 newGrid.lastMove = MoveTree.insert(newMove, newGrid.lastMove);
 
-
-                if (movePoint.isHead()) {
-//                    System.out.println("Head Move");
-                }
-                else {
-//                    System.out.println("Tail Move");
-                }
-//                System.out.println(currentMoveCount);
                 PrintGrid.printIndented(mainGrid.layer,"Movecount: " + currentMoveCount);
                 PrintGrid.printIndented(mainGrid.layer,"Total moveCount: " + mainGrid.layer);
                 PrintGrid.printIndented(mainGrid.layer,"         " + newGrid.backMoveList.get(0) +
                         "                                 " + newGrid.backMoveList.get(1));
-
-//                if (newGrid.backMoveList.get(0) == -998436057 && newGrid.backMoveList.get(1) == -33681082) {
-//                    System.out.println("Stop");
-//                }
                 PrintGrid.printSideBySide(mainGrid.grid, newGrid.grid, newGrid.layer);
-
-
 
                 newGrid.layer++;
                 move(newGrid);
+
+                newGrid.lastMove.children.clear();
+
             }
-
-
-
-//            PrintGrid.PrintArray(moves);
         }
-        //finished all moves
     }
 
     private ArrayList<Integer> getValidMoves (Grid g, Body b) throws Exception {
@@ -225,21 +186,40 @@ public class Solver {
         GridObject current_obj = g.grid[row][col];
 
         if (current_obj.getType() == GridObjectType.EXIT) {
-//            System.out.println("End has been reached");
+
             if (movePoint.getSnake_ID() == 0) {
                 g.lastMove.data.setEnd(true);
                 throw new Exception("End has been reached");
             }
-//            System.exit(0);
         }
+
+        if (current_obj.getType() == GridObjectType.LOCK) {
+
+            if (movePoint.getSnake_ID() == 0) {
+
+                if (((Lock) current_obj).validate(g.grid)) {
+                    g.lastMove.data.setEnd(true);
+                    throw new Exception("End has been reached");
+                }
+            }
+            return false;
+        }
+
 
         switch (current_obj.getType()) {
 
             case EMPTY: return true;
+
             case WALL: return false;
+
+            case KEY:
+                if (movePoint.isHead()) { return true; }
+                return false;
+
             case APPLE:
                 if (movePoint.isHead()) { return true; }
                 return false;
+
             case MUSHROOM:
                 if (movePoint.isHead()) { return true; }
                 return false;
@@ -309,10 +289,6 @@ public class Solver {
 
     private void insert (int hash) {
 
-        if (moveList.size() > 1000000) {
-            System.out.println("Reset moveList");
-            moveList.clear();
-        }
         int pos = Collections.binarySearch(moveList, hash);
         if (pos < 0) {
             moveList.add(-pos-1, hash);

@@ -99,6 +99,27 @@ public class GridParser {
                     else if (data[0].equals("v")) {
                         this.Grid.grid[levelLine][i] = new Mushroom();
                     }
+                    else if (data[0].equals("$")) {
+                        this.Grid.grid[levelLine][i] = new Key();
+                    }
+                    else if (data[0].equals("&")) {
+                        boolean key = false;
+                        boolean apple = false;
+                        boolean mushroom = false;
+
+                        for (int j = 1; j < data.length; j++) {
+                            if (data[j].equals("$")) {
+                                key = true;
+                            }
+                            else if (data[j].equals("^")) {
+                                apple = true;
+                            }
+                            else if (data[j].equals("v")) {
+                                mushroom = true;
+                            }
+                        }
+                        this.Grid.grid[levelLine][i] = new Lock(key, apple, mushroom);
+                    }
                     else if (data[0].charAt(0) == '[') {
 
                         int block_id = Character.getNumericValue(data[0].charAt(1));

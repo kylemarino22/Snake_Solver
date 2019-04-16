@@ -2,6 +2,7 @@ package core;
 
 import GridObjects.Block.Block;
 import GridObjects.GridObject;
+import GridObjects.Lock;
 import GridObjects.Snake.Body;
 
 import MoveTree.*;
@@ -57,6 +58,22 @@ public abstract class PrintGrid {
                     case MUSHROOM:
                         System.out.format("%-7s","v");
                         break;
+
+                    case KEY:
+                        System.out.format("%-7s","$");
+                        break;
+
+                    case LOCK:
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("&");
+
+                        if(((Lock) Grid[i][j]).key) { sb.append(".$"); }
+                        if(((Lock) Grid[i][j]).apple) { sb.append(".^"); }
+                        if(((Lock) Grid[i][j]).mushroom) { sb.append(".v"); }
+
+                        System.out.format("%-7s", sb.toString());
+                        break;
+
 
                     case BLOCK:
                         System.out.format("%-7s","[" + ((Block) Grid[i][j]).getBlock_ID() + "]");
@@ -158,6 +175,21 @@ public abstract class PrintGrid {
 
                         case MUSHROOM:
                             System.out.format("%-7s","v");
+                            break;
+
+                        case KEY:
+                            System.out.format("%-7s","$");
+                            break;
+
+                        case LOCK:
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("&");
+
+                            if(((Lock) temp[i][j]).key) { sb.append(".$"); }
+                            if(((Lock) temp[i][j]).apple) { sb.append(".^"); }
+                            if(((Lock) temp[i][j]).mushroom) { sb.append(".v"); }
+
+                            System.out.format("%-7s", sb.toString());
                             break;
 
                         case BLOCK:

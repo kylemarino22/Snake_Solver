@@ -183,7 +183,8 @@ public class Grid {
                 grid[prevCoords[0]][prevCoords[1]] = replacedObj;
             }
 
-            if (replacedObj.getType() == GridObjectType.MUSHROOM) {
+            if (replacedObj.getType() == GridObjectType.MUSHROOM
+                    || replacedObj.getType() == GridObjectType.KEY) {
                 grid[prevCoords[0]][prevCoords[1]] = new Empty();
             }
 
