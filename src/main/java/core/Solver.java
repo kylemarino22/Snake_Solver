@@ -8,47 +8,59 @@ import GridObjects.Snake.Body;
 import GridObjects.Snake.Snake;
 
 import MoveTree.*;
+//import ThreadHandler.ThreadState;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Solver {
 
 //    private Grid Grid;
 
     //Stores hashes that describe the state of the game
-    public ArrayList<Integer> moveList = new ArrayList<>();
+    public static ArrayList<Integer> moveList = new ArrayList<>();
     public MoveTree MoveTree = new MoveTree();
 
     private static final int MAX_LAYER_COUNT = 35;
 
     private int moveCounter = 0;
-    private long startTime, estimatedTime;
+//    private long startTime, estimatedTime;
 
     public Solver(Grid mainGrid) {
 
         mainGrid.lastMove = MoveTree.head;
         mainGrid.addBackMove(mainGrid.hashCode(-1));
 
-        startTime = System.nanoTime();
+        long startTime = System.nanoTime();
         System.out.println("Solving...");
 
         try {
             move(mainGrid);
         }
         catch (Exception e) {
-            System.out.println("End has been reahed");
+            System.out.println("End has been reached");
         }
         MoveTree.clean();
 
         PrintGrid.printSolution(MoveTree, mainGrid.deepCopy());
 
-        estimatedTime = System.nanoTime();
+        long estimatedTime = System.nanoTime();
 
         System.out.println(TimeConverter.convertTimeToString(estimatedTime - startTime));
 
         System.out.println(moveCounter);
         System.out.println("done");
     }
+
+//    public Solver (Grid mainGrid, ThreadState initVector) {
+//        //Todo: get mainGrid to IV state, recurse 10,000 moves
+//
+//        for (ThreadState.State s: initVector.stateArray) {
+//            mainGrid.moveSnake(s.snakeID, s.direction, s.head);
+//        }
+//
+//
+//    }
 
 
     private void move (Grid mainGrid) throws Exception{
@@ -100,10 +112,16 @@ public class Solver {
                         && newMove.isHead() == newGrid.lastMove.data.isHead()) {
                     //no new move
                     //loop has ocurred
-                    if (!verifyState(newGrid.hashCode(currentMoveCount, newMove.getSnakeID()))) {
+                    int hash = newGrid.hashCode(currentMoveCount, newMove.getSnakeID());
+                    if (find(hash)) {
+
                         PrintGrid.printIndented(mainGrid.layer,"Repeated State");
                         //-857074242
                         continue;
+                    }
+
+                    if(mainGrid.layer < 15) {
+                        insert(hash);
                     }
                 }
                 else {
@@ -123,8 +141,10 @@ public class Solver {
                     PrintGrid.printIndented(mainGrid.layer,"New Move");
 
                     //add to total move list if valid
-                    moveList.add(newGrid.hashCode(currentMoveCount));
 
+                    if(mainGrid.layer < 15) {
+                        insert(newGrid.hashCode(currentMoveCount));
+                    }
 
                     currentMoveCount++;
                 }
@@ -287,16 +307,24 @@ public class Solver {
         return true;
     }
 
-    private boolean verifyState (int hash) {
-        for (Integer state: moveList) {
+    private void insert (int hash) {
 
-            //state has already occurred
-            if (state == hash) { return false; }
+        if (moveList.size() > 1000000) {
+            System.out.println("Reset moveList");
+            moveList.clear();
         }
+        int pos = Collections.binarySearch(moveList, hash);
+        if (pos < 0) {
+            moveList.add(-pos-1, hash);
+        }
+    }
 
-        //state is new
-        moveList.add(hash);
-        return true;
+    private boolean find (int hash) {
+        int pos = Collections.binarySearch(moveList, hash);
+        if (pos > -1) {
+            return true;
+        }
+        return false;
     }
 
 }
