@@ -37,7 +37,6 @@ public class Grid {
         for (int i = 0; i < blockMap.size(); i++) {
             BlockGroup temp = blockMap.get(i);
             temp.blockCount = getMaxArrayIndex(temp.blockArray);
-            System.out.println("stop");
         }
     }
 
@@ -179,8 +178,14 @@ public class Grid {
             if (replacedObj.getType() != GridObjectType.GREEN_SNAKE
                     && replacedObj.getType() != GridObjectType.YELLOW_SNAKE
                     && replacedObj.getType() != GridObjectType.APPLE
-                    && replacedObj.getType() != GridObjectType.MUSHROOM) {
+                    && replacedObj.getType() != GridObjectType.MUSHROOM
+                    && replacedObj.getType() != GridObjectType.KEY) {
                 grid[prevCoords[0]][prevCoords[1]] = replacedObj;
+            }
+
+            if (replacedObj.getType() == GridObjectType.APPLE) {
+                s.bodyArray[s.getLength() - 1].setTail(false);
+                s.bodyArray[s.getLength()].setTail(true);
             }
 
             if (replacedObj.getType() == GridObjectType.MUSHROOM
@@ -240,11 +245,6 @@ public class Grid {
 
                 //update body's self location
                 tail.setCoords(prevCoords[0] - 1, prevCoords[1]);
-
-                if (prevCoords[0] - 1 == -1) {
-                    PrintGrid.printGrid(grid, true);
-                    System.out.println("Stop");
-                }
 
                 if (grid[prevCoords[0] - 1][prevCoords[1]].getType() != GridObjectType.BLOCK) {
                     replacedObj = grid[prevCoords[0] - 1][prevCoords[1]];
