@@ -28,7 +28,7 @@ public class Main{
             System.out.println("File not found!");
         }
 
-        Message message = Message.creator(new PhoneNumber("+16509467854"),
+        Message message = Message.creator(new PhoneNumber("-------------"),
                 new PhoneNumber("+16504762597"),
                 "The level has finished!").create();
 
