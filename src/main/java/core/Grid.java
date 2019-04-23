@@ -5,6 +5,7 @@ import GridObjects.Block.BlockGroup;
 import GridObjects.Empty;
 import GridObjects.GridObject;
 import GridObjects.GridObjectType;
+import GridObjects.Lock;
 import GridObjects.Snake.Body;
 import GridObjects.Snake.Snake;
 import MoveTree.Node;
@@ -19,6 +20,7 @@ public class Grid {
     public Node lastMove;
     public int layer = 0;
     public ArrayList<Integer> backMoveList = new ArrayList<>(2);
+    public ArrayList<Lock> lockArray = new ArrayList<>();
     public static int TOTAL_MOVES;
 
 
@@ -191,6 +193,7 @@ public class Grid {
             if (replacedObj.getType() == GridObjectType.MUSHROOM
                     || replacedObj.getType() == GridObjectType.KEY) {
                 grid[prevCoords[0]][prevCoords[1]] = new Empty();
+                s.bodyArray[s.getLength()].setTail(true);
             }
 
         }
@@ -359,6 +362,11 @@ public class Grid {
 
         for (Integer i: backMoveList) {
             g.backMoveList.add(i);
+
+        }
+
+        for (Lock l: lockArray) {
+            g.lockArray.add(l);
 
         }
 

@@ -2,6 +2,7 @@ package core;
 
 import GridObjects.Block.Block;
 import GridObjects.Block.BlockGroup;
+import GridObjects.Empty;
 import GridObjects.GridObject;
 import GridObjects.GridObjectType;
 import GridObjects.Lock;
@@ -20,7 +21,7 @@ public class Solver {
     public static ArrayList<Integer> moveList = new ArrayList<>();
     public MoveTree MoveTree = new MoveTree();
 
-    private static final int MAX_LAYER_COUNT = 35;
+    private static final int MAX_LAYER_COUNT = 45;
 
     private int moveCounter = 0;
 
@@ -64,6 +65,10 @@ public class Solver {
         }
 
         moveCounter++;
+
+        if (moveCounter % 100000 == 0) {
+            System.out.print(" .");
+        }
 
         ArrayList<Body> movePoints = new ArrayList<>();
 
@@ -195,11 +200,17 @@ public class Solver {
 
         if (current_obj.getType() == GridObjectType.LOCK) {
 
-            if (movePoint.getSnake_ID() == 0) {
+            if (movePoint.getSnake_ID() == 0 || g.lockArray.size() > 1) {
 
                 if (((Lock) current_obj).validate(g.grid)) {
-                    g.lastMove.data.setEnd(true);
-                    throw new Exception("End has been reached");
+
+                    g.grid[row][col] = new Empty();
+                    g.lockArray.remove(current_obj);
+
+                    if (g.lockArray.size() == 0) {
+                        g.lastMove.data.setEnd(true);
+                        throw new Exception("End has been reached");
+                    }
                 }
             }
             return false;

@@ -10,11 +10,11 @@ public class Main{
 
     public static void main(String[] args) {
 
-        final String fileName = "resources/level60.txt";
+        final String fileName = "resources/level63.txt";
 
-        final String ACCOUNT_SID = "AC59dc87bd410ad8e7b4026100ff3abb70";
-        final String AUTH_TOKEN = "f8a70a1e6783755b91e4781bf06fa0ea";
-        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+//        final String ACCOUNT_SID = "AC59dc87bd410ad8e7b4026100ff3abb70";
+//        final String AUTH_TOKEN = "f8a70a1e6783755b91e4781bf06fa0ea";
+//        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
 
 
         GridParser gp;
@@ -28,9 +28,9 @@ public class Main{
             System.out.println("File not found!");
         }
 
-        Message message = Message.creator(new PhoneNumber("-------------"),
-                new PhoneNumber("+16504762597"),
-                "The level has finished!").create();
+//        Message message = Message.creator(new PhoneNumber("-------------"),
+//                new PhoneNumber("+16504762597"),
+//                "The level has finished!").create();
 
 
     }

@@ -118,7 +118,9 @@ public class GridParser {
                                 mushroom = true;
                             }
                         }
-                        this.Grid.grid[levelLine][i] = new Lock(key, apple, mushroom);
+                        Lock temp = new Lock(key, apple, mushroom);
+                        this.Grid.lockArray.add(temp);
+                        this.Grid.grid[levelLine][i] = temp;
                     }
                     else if (data[0].charAt(0) == '[') {
 
